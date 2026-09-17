@@ -1,0 +1,160 @@
+version: 2
+
+models:
+  - name: stg_orders
+    description: "Staged orders data after cleaning, renaming, and casting types."
+    columns:
+      - name: order_id
+        description: "Unique identifier of the order."
+        data_tests:
+          - unique
+          - not_null
+      - name: customer_id
+        description: "Customer identifier associated with the order."
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('stg_customers')
+              field: customer_id
+      - name: order_status
+        description: "Current status of the order."
+        data_tests:
+          - not_null
+          - accepted_values:
+              values:
+                - 'delivered'
+                - 'shipped'
+                - 'canceled'
+                - 'unavailable'
+                - 'invoiced'
+                - 'processing'
+                - 'created'
+                - 'approved'
+
+  - name: stg_customers
+    description: "Customer details and demographic location data."
+    columns:
+      - name: customer_id
+        description: "Unique customer key per specific order."
+        data_tests:
+          - unique
+          - not_null
+      - name: customer_unique_id
+        description: "Unique identifier for each customer across all orders."
+        data_tests:
+          - not_null
+
+  - name: stg_order_items
+    description: "Details of items purchased within each order, including price and seller info."
+    columns:
+      - name: order_id
+        description: "Identifier of the order."
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('stg_orders')
+              field: order_id
+      - name: item_sequence
+        description: "Sequential number identifying the item inside the same order."
+        data_tests:
+          - not_null
+      - name: product_id
+        description: "Identifier of the purchased product."
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('stg_products')
+              field: product_id
+      - name: seller_id
+        description: "Identifier of the product seller."
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('stg_sellers')
+              field: seller_id
+
+  - name: stg_products
+    description: "Product attributes, category names, and physical dimensions."
+    columns:
+      - name: product_id
+        description: "Unique product identifier."
+        data_tests:
+          - unique
+          - not_null
+
+  - name: stg_payments
+    description: "Payment methods, installment details, and transaction values."
+    columns:
+      - name: order_id
+        description: "Identifier of the order."
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('stg_orders')
+              field: order_id
+      - name: payment_sequence
+        description: "Sequence number of payment method applied to the order."
+        data_tests:
+          - not_null
+      - name: payment_type
+        description: "Method of payment chosen by the customer."
+        data_tests:
+          - not_null
+          - accepted_values:
+              values:
+                - 'credit_card'
+                - 'boleto'
+                - 'voucher'
+                - 'debit_card'
+                - 'not_defined'
+
+  - name: stg_order_reviews
+    description: "Customer ratings, comments, and review timestamps for orders."
+    columns:
+      - name: review_id
+        description: "Unique review identifier."
+        data_tests:
+          - not_null
+      - name: order_id
+        description: "Identifier of the reviewed order."
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('stg_orders')
+              field: order_id
+      - name: review_score
+        description: "Customer review rating score ranging from 1 to 5."
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: [1, 2, 3, 4, 5]
+
+  - name: stg_sellers
+    description: "Seller profile details and regional location data."
+    columns:
+      - name: seller_id
+        description: "Unique seller identifier."
+        data_tests:
+          - unique
+          - not_null
+
+  - name: stg_product_category_name_translation
+    description: "Translation table for product category names from Portuguese to English."
+    columns:
+      - name: category_name_pt
+        description: "Product category name in Portuguese."
+        data_tests:
+          - unique
+          - not_null
+      - name: category_name_en
+        description: "Product category name translated into English."
+        data_tests:
+          - not_null
+
+  - name: stg_geolocation
+    description: "Geographic coordinates (latitude/longitude) mapped to zip code prefixes."
+    columns:
+      - name: zip_code
+        description: "Zip code prefix."
+        data_tests:
+          - not_null
