@@ -1,0 +1,14 @@
+version: 2
+
+sources:
+  - name: olist
+    tables:
+      - name: customers
+      - name: order_items
+      - name: orders
+      - name: products
+      - name: sellers
+      - name: geolocation
+      - name: product_category_name_translation
+      - name: order_payments
+      - name: order_reviews
