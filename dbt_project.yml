@@ -33,7 +33,5 @@ models:
   olist_project:
     staging:
       +materialized: view
-    intermidiate:
-      +materialized: ephemeral
     marts:
       +materialized: table
